@@ -25,6 +25,9 @@ PotBuster performs multiple active checks against an SSH server, then calculates
 ---
 
 ---
+## Video example
+
+![how_it_works](https://github.com/Batcherss/potbuster/github/how-works.mp4)
 
 ## Usage
 
@@ -44,6 +47,7 @@ cd potbuster
 go run main.go
 ```
 or download build
+
 4. **Enter target IP:**
 
 ```text
