@@ -4,27 +4,30 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	mrand "math/rand" 
 	"net"
 	"strings"
 	"time"
 )
 
 func CheckProtocolVersion(target string) (string, float64) {
-	time.Sleep(getRandomDelay(1000, 3000)) 
+	time.Sleep(getRandomDelay4(1000, 3000)) 
 
-	conn, err := net.DialTimeout("tcp", target, time.Duration(2+rand.Intn(3))*time.Second)
+	conn, err := net.DialTimeout("tcp", target, time.Duration(2+mrand.Intn(3))*time.Second)
 	if err != nil {
 		return fmt.Sprintf("❌ Connection failed: %v", err), 0
 	}
 	defer conn.Close()
 	conn.SetDeadline(time.Now().Add(4 * time.Second))
+	
 	clientVersions := []string{
 		"SSH-1.99-OpenSSH_7.4p1",
 		"SSH-1.99-Next-1.02",
 		"SSH-1.99-ProSSH_0.22",
 	}
-	version := clientVersions[rand.Intn(len(clientVersions))]
+	version := clientVersions[mrand.Intn(len(clientVersions))]
 	conn.Write([]byte(version + "\r\n"))
+	
 	buf := make([]byte, 512)
 	n, err := conn.Read(buf)
 	if err != nil {
@@ -33,6 +36,7 @@ func CheckProtocolVersion(target string) (string, float64) {
 		}
 		return fmt.Sprintf("✅ Connection closed (normal): %v", err), 10
 	}
+	
 	response := strings.TrimSpace(string(buf[:n]))
 	honeypotIndicators := []struct {
 		pattern    string
@@ -62,7 +66,10 @@ func CheckProtocolVersion(target string) (string, float64) {
 	}
 }
 
-func getRandomDelay(min, max int) time.Duration {
-	randNum, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+func getRandomDelay4(min, max int) time.Duration {
+	randNum, err := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+	if err != nil {
+		return time.Duration(min) * time.Millisecond
+	}
 	return time.Duration(min+int(randNum.Int64())) * time.Millisecond
 }

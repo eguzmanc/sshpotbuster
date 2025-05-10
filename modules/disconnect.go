@@ -1,16 +1,15 @@
 package modules
 
 import (
-	"crypto/rand"
-	"math/big"
+	"math/rand"
 	"net"
 	"time"
 )
 
 func CheckDisconnect(target string) (string, float64) {
+	reconnectDelay := getRandomDelay(2000, 8000)
 
-	initialDelay := getRandomDelay(1000, 5000) // 1-5 секунд
-	reconnectDelay := getRandomDelay(2000, 8000) // 2-8 секунд
+	rand.Seed(time.Now().UnixNano())
 
 	conn1, err := net.DialTimeout("tcp", target, time.Duration(3+rand.Intn(3))*time.Second)
 	if err != nil {
@@ -22,7 +21,9 @@ func CheckDisconnect(target string) (string, float64) {
 	_, err = conn1.Read(buf)
 	hasBanner := err == nil
 	conn1.Close()
+
 	time.Sleep(reconnectDelay)
+
 	conn2, err := net.DialTimeout("tcp", target, time.Duration(3+rand.Intn(3))*time.Second)
 	if err != nil {
 		if hasBanner {
@@ -64,6 +65,8 @@ func checkTempBlock(target string) bool {
 }
 
 func getRandomDelay(min, max int) time.Duration {
-	randNum, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
-	return time.Duration(min+int(randNum.Int64())) * time.Millisecond
+	if max <= min {
+		return time.Duration(min) * time.Millisecond
+	}
+	return time.Duration(min+rand.Intn(max-min)) * time.Millisecond
 }

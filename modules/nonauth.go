@@ -1,17 +1,18 @@
 package modules
 
 import (
-	"crypto/rand"
+	"bytes"
+	crand "crypto/rand" 
 	"fmt"
 	"math/big"
+	mrand "math/rand" 
 	"net"
-	"strings"
 	"time"
 )
 
 func CheckNoneAuth(target string) (string, float64) {
-	time.Sleep(getRandomDelay(1000, 5000)) // 1-5 секунд
-	conn, err := net.DialTimeout("tcp", target, time.Duration(3+rand.Intn(4))*time.Second)
+	time.Sleep(getRandomDelay1(1000, 5000)) 
+	conn, err := net.DialTimeout("tcp", target, time.Duration(3+mrand.Intn(4))*time.Second)
 	if err != nil {
 		return fmt.Sprintf("❌ Connection failed: %v", err), 0
 	}
@@ -22,9 +23,9 @@ func CheckNoneAuth(target string) (string, float64) {
 		"SSH-2.0-PuTTY_Release_0.76",
 		"SSH-2.0-libssh-0.9.5",
 	}
-	banner := clientBanners[rand.Intn(len(clientBanners))] + "\r\n"
+	banner := clientBanners[mrand.Intn(len(clientBanners))] + "\r\n"
 	conn.Write([]byte(banner))
-	time.Sleep(getRandomDelay(200, 1000))
+	time.Sleep(getRandomDelay1(200, 1000))
 	noneAuthPacket := []byte{
 		0x00, 0x00, 0x00, 0x14, 
 		0x06,                     
@@ -32,7 +33,7 @@ func CheckNoneAuth(target string) (string, float64) {
 		0x6e, 0x6f, 0x6e, 0x65, 
 	}
 
-	randByte, _ := rand.Int(rand.Reader, big.NewInt(256))
+	randByte, _ := crand.Int(crand.Reader, big.NewInt(256))
 	noneAuthPacket[5] = byte(randByte.Int64() % 16) 
 	conn.Write(noneAuthPacket)
 	buf := make([]byte, 1024)
@@ -76,7 +77,7 @@ func CheckNoneAuth(target string) (string, float64) {
 	}
 }
 
-func getRandomDelay(min, max int) time.Duration {
-	randNum, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+func getRandomDelay1(min, max int) time.Duration {
+	randNum, _ := crand.Int(crand.Reader, big.NewInt(int64(max-min)))
 	return time.Duration(min+int(randNum.Int64())) * time.Millisecond
 }

@@ -1,16 +1,17 @@
 package modules
 
 import (
-	"crypto/rand"
 	"fmt"
-	"math/big"
+	"math/rand"
 	"net"
 	"strings"
 	"time"
 )
 
 func CheckHelp(target string) (string, float64) {
-	time.Sleep(getRandomDelay(1000, 5000)) 
+	time.Sleep(getRandomDelay2(1000, 5000))
+
+	rand.Seed(time.Now().UnixNano())
 
 	conn, err := net.DialTimeout("tcp", target, time.Duration(3+rand.Intn(4))*time.Second)
 	if err != nil {
@@ -18,13 +19,14 @@ func CheckHelp(target string) (string, float64) {
 	}
 	defer conn.Close()
 
-
 	conn.SetDeadline(time.Now().Add(5 * time.Second))
-	_, err = conn.Write([]byte("SSH-2.0-9.53b\r\n")) // 
+	_, err = conn.Write([]byte("SSH-2.0-9.53b\r\n"))
 	if err != nil {
 		return fmt.Sprintf("❌ Failed to send client header: %v", err), 0
 	}
-	time.Sleep(getRandomDelay(200, 1000))
+
+	time.Sleep(getRandomDelay2(200, 1000))
+
 	_, err = conn.Write([]byte("\x00\x00\x00\x04\x0Ahelp"))
 	if err != nil {
 		return fmt.Sprintf("❌ Failed to send help command: %v", err), 0
@@ -70,9 +72,11 @@ func CheckHelp(target string) (string, float64) {
 	}
 }
 
-func getRandomDelay(min, max int) time.Duration {
-	randNum, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
-	return time.Duration(min+int(randNum.Int64())) * time.Millisecond
+func getRandomDelay2(min, max int) time.Duration {
+	if max <= min {
+		return time.Duration(min) * time.Millisecond
+	}
+	return time.Duration(min+rand.Intn(max-min)) * time.Millisecond
 }
 
 func truncate(s string, n int) string {
