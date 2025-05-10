@@ -1,11 +1,12 @@
 package modules
 
 import (
+	"math/rand"
 	"net"
 	"time"
 )
 
-func CheckStealthNoneAuth(target string) (string, float64) {
+func CheckNoneAuth(target string) (string, float64) {
 	conn, err := net.DialTimeout("tcp", target, time.Duration(2 + rand.Intn(3)) * time.Second)
 	if err != nil {
 		return "❌ Connection failed (timeout)", 0
