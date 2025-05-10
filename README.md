@@ -27,7 +27,7 @@ PotBuster performs multiple active checks against an SSH server, then calculates
 ---
 ## Video example
 
-![how_it_works](https://github.com/Batcherss/potbuster/github/how-works.mp4)
+[how it works](./github/how-works.mp4)
 
 ## Usage
 
