@@ -1,32 +1,68 @@
 package modules
 
 import (
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"net"
 	"strings"
 	"time"
 )
 
 func CheckProtocolVersion(target string) (string, float64) {
-	conn, err := net.DialTimeout("tcp", target, 3*time.Second)
+	time.Sleep(getRandomDelay(1000, 3000)) 
+
+	conn, err := net.DialTimeout("tcp", target, time.Duration(2+rand.Intn(3))*time.Second)
 	if err != nil {
-		return "❌ Connection failed", 0
+		return fmt.Sprintf("❌ Connection failed: %v", err), 0
 	}
 	defer conn.Close()
+	conn.SetDeadline(time.Now().Add(4 * time.Second))
+	clientVersions := []string{
+		"SSH-1.99-OpenSSH_7.4p1",
+		"SSH-1.99-Next-1.02",
+		"SSH-1.99-ProSSH_0.22",
+	}
+	version := clientVersions[rand.Intn(len(clientVersions))]
+	conn.Write([]byte(version + "\r\n"))
+	buf := make([]byte, 512)
+	n, err := conn.Read(buf)
+	if err != nil {
+		if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+			return "✅ Timeout (normal behavior)", 10
+		}
+		return fmt.Sprintf("✅ Connection closed (normal): %v", err), 10
+	}
+	response := strings.TrimSpace(string(buf[:n]))
+	honeypotIndicators := []struct {
+		pattern    string
+		confidence int
+		message    string
+	}{
+		{"SSH-1.99", 100, "🚨 Accepts legacy version (Honeypot!)"},
+		{"Protocol mismatch", 20, "✅ Normal: Protocol mismatch"},
+		{"Invalid protocol", 20, "✅ Normal: Invalid protocol"},
+		{"cowrie", 99, "☣️ Cowrie honeypot detected"},
+		{"kippo", 99, "☣️ Kippo honeypot detected"},
+	}
 
-	conn.Write([]byte("SSH-1.99-DickClient\r\n"))
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
-
-	buf := make([]byte, 256)
-	n, _ := conn.Read(buf)
-	response := string(buf[:n])
+	for _, indicator := range honeypotIndicators {
+		if strings.Contains(response, indicator.pattern) {
+			return fmt.Sprintf("%s: %s", indicator.message, response), float64(indicator.confidence)
+		}
+	}
 
 	switch {
 	case strings.Contains(response, "SSH-2.0"):
 		return "✅ SSH-2.0 only (Normal)", 10
-	case strings.Contains(response, "SSH-1.99"):
-		return "🚨 Accepts fake version (Honeypot!)", 100
+	case n == 0:
+		return "✅ No response (Normal)", 10
 	default:
-		return fmt.Sprintf("❔Unknown response: %s", response), 50
+		return fmt.Sprintf("⚠️ Unknown response: %s", response), 30
 	}
+}
+
+func getRandomDelay(min, max int) time.Duration {
+	randNum, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+	return time.Duration(min+int(randNum.Int64())) * time.Millisecond
 }

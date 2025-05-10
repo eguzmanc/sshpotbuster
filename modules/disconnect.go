@@ -1,36 +1,69 @@
 package modules
 
 import (
+	"crypto/rand"
+	"math/big"
 	"net"
 	"time"
 )
 
 func CheckDisconnect(target string) (string, float64) {
-	conn1, err := net.DialTimeout("tcp", target, 4*time.Second)
+
+	initialDelay := getRandomDelay(1000, 5000) // 1-5 секунд
+	reconnectDelay := getRandomDelay(2000, 8000) // 2-8 секунд
+
+	conn1, err := net.DialTimeout("tcp", target, time.Duration(3+rand.Intn(3))*time.Second)
 	if err != nil {
-		return "❌ Error during connection. (Connect unsuccesful)", 0
+		return "❌ Initial connection failed", 0
 	}
-	conn1.SetReadDeadline(time.Now().Add(2 * time.Second))
-	buf := make([]byte, 256)
+
+	conn1.SetReadDeadline(time.Now().Add(3 * time.Second))
+	buf := make([]byte, 512)
 	_, err = conn1.Read(buf)
 	hasBanner := err == nil
 	conn1.Close()
-	time.Sleep(3 * time.Second)
-	conn2, err := net.DialTimeout("tcp", target, 4*time.Second)
+	time.Sleep(reconnectDelay)
+	conn2, err := net.DialTimeout("tcp", target, time.Duration(3+rand.Intn(3))*time.Second)
 	if err != nil {
 		if hasBanner {
-			return "🚨 Server stopped responding after disconnection (possible honeypot)", 85
+			time.Sleep(5 * time.Second)
+			if checkTempBlock(target) {
+				return "🚨 Server appears to be blocking our IP after connection", 90
+			}
+			return "🚨 Server stopped responding after disconnection (honeypot behavior)", 85
 		}
-		return "❌ Reconnection error", 0
+		return "❌ Reconnection failed", 0
 	}
 	defer conn2.Close()
-	conn2.SetReadDeadline(time.Now().Add(2 * time.Second))
+
+	conn2.SetReadDeadline(time.Now().Add(3 * time.Second))
 	_, err = conn2.Read(buf)
 	if err != nil {
-		return "⚠️ Reconnection successful, but banner not received", 40
+		if hasBanner {
+			return "⚠️ Reconnected but no banner received (suspicious)", 60
+		}
+		return "⚠️ Reconnected but no banner received in both attempts", 40
 	}
+
 	if hasBanner {
-		return "✅ Successful reconnection with banner received", 20
+		return "✅ Normal behavior: successful reconnection with banner", 10
 	}
-	return "⚠️ Reconnection successful, but banner not received in both cases", 50
+	return "⚠️ Banner received only on reconnection (unusual)", 50
+}
+
+func checkTempBlock(target string) bool {
+	for i := 0; i < 3; i++ {
+		time.Sleep(time.Duration(1+i) * time.Second)
+		conn, err := net.DialTimeout("tcp", target, 3*time.Second)
+		if err == nil {
+			conn.Close()
+			return false
+		}
+	}
+	return true
+}
+
+func getRandomDelay(min, max int) time.Duration {
+	randNum, _ := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+	return time.Duration(min+int(randNum.Int64())) * time.Millisecond
 }
