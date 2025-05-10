@@ -23,8 +23,6 @@ PotBuster performs multiple active checks against an SSH server, then calculates
 | `Trash Send`       | Sends invalid binary/junk data to see if server responds "too politely"      |
 
 ---
-
----
 ## Video example
 
 ![how it works](./github/how-works.gif)
