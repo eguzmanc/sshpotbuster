@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -20,29 +22,53 @@ var knownHoneypotBanners = []string{
 }
 
 func CheckBanner(target string) (string, float64) {
-	conn, err := net.DialTimeout("tcp", target, 4*time.Second)
+	const (
+		connectTimeout = 4 * time.Second
+		readTimeout    = 2 * time.Second
+	)
+	conn, err := net.DialTimeout("tcp", target, connectTimeout)
 	if err != nil {
-		return "❌ Connection failed", 0
+		return fmt.Sprintf("❌ Connection failed: %v", err), 0
 	}
 	defer conn.Close()
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(readTimeout))
 	reader := bufio.NewReader(conn)
 	banner, err := reader.ReadString('\n')
 	if err != nil {
-		return "❌ No banner received", 0
+		return fmt.Sprintf("❌ Failed to read banner: %v", err), 0
 	}
 	banner = strings.TrimSpace(banner)
-
 	for _, hpBanner := range knownHoneypotBanners {
-		if strings.HasPrefix(banner, hpBanner) { 
-			return fmt.Sprintf("🚨 Honeypot detected: %s", banner), 95
+		if strings.Contains(banner, hpBanner) {
+			return fmt.Sprintf("🚨 Honeypot detected (known signature): %s", banner), 95
 		}
+	}
+	if strings.Contains(banner, "OpenSSH") {
+		versionRegex := regexp.MustCompile(`OpenSSH[_\-](\d+)`)
+		matches := versionRegex.FindStringSubmatch(banner)
+		if len(matches) > 1 {
+			version, err := strconv.Atoi(matches[1])
+			if err == nil {
+				switch {
+				case version < 5:
+					return fmt.Sprintf("⚠️ Suspicious banner (very old OpenSSH v%d): %s", version, banner), 80
+				case version < 7:
+					return fmt.Sprintf("⚠️ Outdated OpenSSH version (v%d): %s", version, banner), 60
+				case version < 8:
+					return fmt.Sprintf("📜 OpenSSH v%d (slightly outdated): %s", version, banner), 30
+				}
+			}
+		}
+	}
+	suspiciousPatterns := []string{"test", "mock", "fake", "dummy", "honeypot", "unknown"}
+	for _, pattern := range suspiciousPatterns {
+		if strings.Contains(strings.ToLower(banner), pattern) {
+			return fmt.Sprintf("⚠️ Suspicious banner pattern detected (%s): %s", pattern, banner), 70
+		}
+	}
+	if !strings.HasPrefix(banner, "SSH-2.0-") && !strings.HasPrefix(banner, "SSH-1.99-") {
+		return fmt.Sprintf("⚠️ Non-standard SSH banner: %s", banner), 50
 	}
 
-	if strings.Contains(banner, "OpenSSH") {
-		if strings.Contains(banner, "OpenSSH_3") || strings.Contains(banner, "OpenSSH_4") {
-			return fmt.Sprintf("⚠️ Suspicious banner (old OpenSSH): %s", banner), 70
-		}
-	}
-	return fmt.Sprintf("📜 SSH Banner (may not honeypot): %s", banner), 20
+	return fmt.Sprintf("📜 SSH Banner (no clear honeypot indicators): %s", banner), 10
 }
