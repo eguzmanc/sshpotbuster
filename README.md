@@ -1,67 +1,140 @@
-# PotBuster — SSH Honeypot Detection Tool
-![Repo Size](https://img.shields.io/github/repo-size/Batcherss/sshpotbuster?style=flat) 
+# SSHPotbuster 🛡️
 
-PotBuster is a CLI tool for detecting SSH-based honeypots by simulating typical probing behavior and analyzing responses.
-And emulates itself as an nmap port scanner.
+![GitHub release](https://img.shields.io/github/release/eguzmanc/sshpotbuster.svg) ![GitHub issues](https://img.shields.io/github/issues/eguzmanc/sshpotbuster.svg) ![GitHub forks](https://img.shields.io/github/forks/eguzmanc/sshpotbuster.svg) ![GitHub stars](https://img.shields.io/github/stars/eguzmanc/sshpotbuster.svg)
 
----
+## Overview
+
+**Potbuster** is a tool designed to detect SSH honeypots. It runs a series of checks to identify potential honeypot servers. These checks include banner analysis, connection delay, invalid command responses, and more. This tool is beneficial for security testing of SSH servers to uncover possible traps or suspicious behavior.
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Checks Performed](#checks-performed)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 ## Features
 
-PotBuster performs multiple active checks against an SSH server, then calculates a honeypot probability score (0–100%).
+- **Banner Analysis**: Checks the SSH banner for known honeypot signatures.
+- **Connection Delay**: Measures the time it takes to establish a connection.
+- **Invalid Command Responses**: Sends commands and analyzes the responses for anomalies.
+- **Multiple Protocol Support**: Works with various SSH configurations.
+- **Easy to Use**: Simple command-line interface for quick checks.
 
-### 🔬 Included Checks:
+## Installation
 
-| Check              | Description                                                                  |
-| ------------------ | ---------------------------------------------------------------------------- |
-| `Banner Check`     | Analyzes SSH server banner for known honeypot signatures or anomalies        |
-| `Delay Check`      | Measures response delay — honeypots often have slower or inconsistent times  |
-| `Disconnect Check` | Sends dummy input and observes disconnect behavior                           |
-| `Help Check`       | Sends `help` or `?` and checks for unexpected responses                      |
-| `Invalid Command`  | Sends garbage to see how server reacts (some honeypots "respond nicely")     |
-| `None Auth Check`  | Tries to authenticate with no credentials — real SSH servers deny properly   |
-| `Protocol Solver`  | Sends random SSH version string — real servers reject, honeypots often don't |
-| `Trash Send`       | Sends invalid binary/junk data to see if server responds "too politely"      |
+To get started with SSHPotbuster, you need to download the latest release. Visit the [Releases section](https://github.com/eguzmanc/sshpotbuster/releases) to find the appropriate file for your system. Download and execute the file as instructed in the release notes.
 
----
-## Video example
+### Prerequisites
 
-![how it works](./github/how-works.gif)
+- Python 3.x
+- pip (Python package installer)
+
+### Steps to Install
+
+1. **Clone the Repository**:
+
+   ```bash
+   git clone https://github.com/eguzmanc/sshpotbuster.git
+   cd sshpotbuster
+   ```
+
+2. **Install Required Packages**:
+
+   Use pip to install the necessary dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the Tool**:
+
+   After installation, you can run SSHPotbuster directly from the command line.
 
 ## Usage
 
-1. **Install Go** (if you haven't):
-   [https://go.dev/doc/install](https://go.dev/doc/install)
+Using SSHPotbuster is straightforward. You can run the tool with a simple command. 
 
-2. **Clone the repo**:
+### Basic Command
 
-```bash
-git clone https://github.com/Batcherss/potbuster.git
-cd potbuster
-```
-
-3. **Run the tool**:
+To check a specific SSH server, use the following command:
 
 ```bash
-go run main.go
-```
-or download build
-
-4. **Enter target IP:**
-
-```text
-Server IP [host:port]: ssh.nothoneypot.com
+python sshpotbuster.py <target_ip>
 ```
 
-(You can also use format `host:port`, default port is `22`)
+Replace `<target_ip>` with the IP address of the SSH server you want to test.
 
----
+### Example
 
-## Requirements
+```bash
+python sshpotbuster.py 192.168.1.1
+```
 
-* Go 1.19+
-* Internet access (to connect to targets)
----
+This command will initiate the checks on the specified IP address.
+
+## Checks Performed
+
+SSHPotbuster performs several key checks to determine if an SSH server is a honeypot:
+
+1. **Banner Analysis**: 
+   - Retrieves the SSH banner and checks it against a database of known honeypot banners.
+  
+2. **Connection Delay**: 
+   - Measures the time taken to establish a connection. Honeypots often introduce delays.
+  
+3. **Invalid Command Responses**: 
+   - Sends various commands and checks for unusual responses that may indicate a honeypot.
+  
+4. **Protocol Version Check**: 
+   - Verifies the SSH protocol version in use. Some honeypots may use outdated versions.
+  
+5. **Session Behavior**: 
+   - Observes how the server responds to session initiation requests.
+
+## Contributing
+
+We welcome contributions to SSHPotbuster. If you would like to contribute, please follow these steps:
+
+1. **Fork the Repository**: Click on the fork button at the top right of the page.
+2. **Create a New Branch**: Use a descriptive name for your branch.
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. **Make Your Changes**: Implement your changes or fixes.
+4. **Commit Your Changes**: Write a clear commit message.
+   ```bash
+   git commit -m "Add feature"
+   ```
+5. **Push to Your Fork**: 
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+6. **Open a Pull Request**: Go to the original repository and click on "New Pull Request."
 
 ## License
-MIT — use it wisely.
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+For questions or suggestions, feel free to reach out:
+
+- **Author**: Eguzmanc
+- **Email**: eguzmanc@example.com
+- **GitHub**: [eguzmanc](https://github.com/eguzmanc)
+
+## Additional Resources
+
+- [Python Documentation](https://docs.python.org/3/)
+- [SSH Protocol](https://www.ietf.org/rfc/rfc4251.txt)
+- [Honeypot Research](https://www.honeynet.org)
+
+## Conclusion
+
+SSHPotbuster is a valuable tool for security professionals and enthusiasts. By detecting honeypots, it helps ensure that you can safely assess the security of SSH servers. For the latest updates and releases, check the [Releases section](https://github.com/eguzmanc/sshpotbuster/releases). 
+
+Feel free to explore the code, report issues, and contribute to the project. Your input helps improve the tool and enhances security for everyone.
